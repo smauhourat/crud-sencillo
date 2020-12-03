@@ -35,6 +35,9 @@ class App extends Component {
 
   mostrarModal = (modoEditar) => {
     this.setState({mostrarModal: true, modalModoEditar: modoEditar});
+    if (modoEditar) {
+      this.setState({});
+    }
   }
 
   ocultarModal = () => {
@@ -49,7 +52,7 @@ class App extends Component {
       dataUpdated.push(nuevoElemento);
       this.setState({
         data: dataUpdated,
-        modalInsertar: false,
+        mostrarModal: false,
         form: {
           id: '',
           personaje: '',
@@ -103,7 +106,7 @@ class App extends Component {
               </Col>
             </Row>            
           </Container>
-          <Modal isOpen={this.state.modalInsertar || this.state.modalEditar }>
+          <Modal isOpen={this.state.mostrarModal }>
             <ModalHeader>
               <div>
                 <h3>
@@ -126,7 +129,7 @@ class App extends Component {
               </FormGroup>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={() => this.insertarElemento(false)}>Insertar</Button>
+              <Button color="primary" onClick={() => this.grabarElemento()}>Insertar</Button>
               <Button color="danger" onClick={() => this.ocultarModal()}>Cancelar</Button>
             </ModalFooter>
           </Modal>
