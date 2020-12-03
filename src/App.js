@@ -33,34 +33,93 @@ class App extends Component {
     });
   }
 
-  mostrarModal = (modoEditar) => {
-    this.setState({mostrarModal: true, modalModoEditar: modoEditar});
-    if (modoEditar) {
-      this.setState({});
-    }
+  mostrarModalInsertar = () => {
+    this.setState({mostrarModal: true, modalModoEditar: false});
+  }
+
+  mostrarModalEditar = (elemento) => {
+    this.setState({mostrarModal: true, modalModoEditar: true, form: elemento});
   }
 
   ocultarModal = () => {
-    this.setState({mostrarModal: false});
+    this.setState({
+      mostrarModal: false,
+      form: {
+        id: '',
+        personaje: '',
+        anime: ''
+      }, 
+    });
   }  
 
-  grabarElemento = (modoEditar) => {
-    if (!modoEditar) {
-      var nuevoElemento = {...this.state.form};
-      nuevoElemento.id = this.state.data.length+1;
-      var dataUpdated = this.state.data;
-      dataUpdated.push(nuevoElemento);
-      this.setState({
-        data: dataUpdated,
-        mostrarModal: false,
-        form: {
-          id: '',
-          personaje: '',
-          anime: ''
-        },      
-      });
-    }
+  insertarElemento = () => {
+    var nuevoElemento = {...this.state.form};
+    nuevoElemento.id = this.state.data.length+1;
+    var dataUpdated = this.state.data;
+    dataUpdated.push(nuevoElemento);
+    this.setState({
+      data: dataUpdated,
+      mostrarModal: false,
+      form: {
+        id: '',
+        personaje: '',
+        anime: ''
+      },      
+    });
+  }
 
+  // actualizarElemento = () => {
+  //   var actualizadoElemento = {...this.state.form};
+  //   var dataUpdated = this.state.data;
+  //   console.log(dataUpdated);
+  //   console.log(actualizadoElemento);
+  //   dataUpdated.map(ele =>  
+  //     ele.id === actualizadoElemento.id 
+  //     ? {...ele, id: actualizadoElemento.id, personaje: actualizadoElemento.personaje, anime: actualizadoElemento.anime} 
+  //     : ele
+  //   );
+  //   console.log(dataUpdated);
+  //   this.setState({
+  //     data: dataUpdated,
+  //     mostrarModal: false,
+  //     form: {
+  //       id: '',
+  //       personaje: '',
+  //       anime: ''
+  //     },      
+  //   });    
+  // }
+
+  actualizarElemento = () => {
+    var idx = 0;
+    var actualizadoElemento = this.state.form;
+    console.log(actualizadoElemento);
+    var dataUpdated = this.state.data;
+    dataUpdated.map((ele) => {
+      if (ele.id === actualizadoElemento.id) {
+        dataUpdated[idx].personaje = actualizadoElemento.personaje;
+        dataUpdated[idx].anime = actualizadoElemento.anime;
+      }
+      idx++;
+    });
+    this.setState({
+      data: dataUpdated,
+      mostrarModal: false,
+      form: {
+        id: '',
+        personaje: '',
+        anime: ''
+      },      
+    });       
+  }
+
+  grabarElemento = () => {
+    if (!this.state.modalModoEditar) {
+      this.insertarElemento();
+    }
+    else {
+      this.actualizarElemento();
+    }
   }
 
   eliminarElemento = (e) => {
@@ -71,13 +130,14 @@ class App extends Component {
   }
 
   render() {
+    let inputId = (this.state.modalModoEditar) ? <input className="form-control" name="id" readonlye type="text" value={this.state.form.id} /> : <input className="form-control" name="id" readonlye type="text" value={this.state.data.length+1} />
     return (
       <>
           <Container>
             <Row><Col>&nbsp;</Col></Row>
             <Row>
               <Col>
-                <Button color="success" onClick={() => this.mostrarModal(false)}>Insertar nuevo personaje</Button>
+                <Button color="success" onClick={() => this.mostrarModalInsertar()}>Insertar nuevo personaje</Button>
               </Col>
             </Row>
             <Row>
@@ -97,7 +157,7 @@ class App extends Component {
                           <td>{ele.id}</td>     
                           <td>{ele.personaje}</td>     
                           <td>{ele.anime}</td>
-                          <td><Button color="primary" onClick={() => this.mostrarModal(true)}>Editar</Button></td>
+                          <td><Button color="primary" onClick={() => this.mostrarModalEditar(ele)}>Editar</Button></td>
                           <td><Button color="danger" onClick={() => this.eliminarElemento(ele)}>Eliminar</Button></td>
                         </tr>
                       ))}
@@ -110,14 +170,14 @@ class App extends Component {
             <ModalHeader>
               <div>
                 <h3>
-                  {this.state.modalEditar ? "Editar Registro" : "Insertar Registro"}
+                  {this.state.modalModoEditar ? "Editar Registro" : "Insertar Registro"}
                 </h3>
               </div>
             </ModalHeader>
             <ModalBody>
             <FormGroup>
                 <label>Id:</label>
-                <input className="form-control" name="id" readonlye type="text" value={this.state.data.length+1} />
+                {inputId}
               </FormGroup>
               <FormGroup>
                 <label>Personaje:</label>
@@ -129,7 +189,7 @@ class App extends Component {
               </FormGroup>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={() => this.grabarElemento()}>Insertar</Button>
+                      <Button color="primary" onClick={() => this.grabarElemento()}>{this.state.modalModoEditar ? "Grabar" : "Insertar"}</Button>
               <Button color="danger" onClick={() => this.ocultarModal()}>Cancelar</Button>
             </ModalFooter>
           </Modal>
